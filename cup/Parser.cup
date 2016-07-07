@@ -1,0 +1,31 @@
+package Example;
+
+import java_cup.runtime.*;
+
+parser code {:
+	public static void main(String args[]) throws Exception {
+		SymbolFactory sf = new DefaultSymbolFactory();
+		if (args.length==0){
+		new Parser(new Scanner(System.in,sf),sf).parse();
+		}
+		else{
+		new Parser(new Scanner(new java.io.FileInputStream(args[0]),sf),sf).parse();
+		System.out.println("Parsing succeeded");
+		}
+	}
+:}
+
+/* ==== Terminal declarations ==== */
+terminal COMMA, LSQBRACKET, RSQBRACKET, LCBRACKET, RCBRACKET, BOOLEAN, NULL, STRING, COLON, NUMBER;
+
+/* ==== Non Terminal declarations ==== */
+non terminal object, members, pair, array, elements, value;
+
+/* ==== Grammar rules (productions)==== */
+/* Rules derived from the JSON specification */
+object ::= LCBRACKET RCBRACKET | LCBRACKET members RCBRACKET; /* JSON object is formed by {} or {members} */
+members ::= pair | pair COMMA members; /* members consists of 1 or more pair */
+pair ::= STRING COLON value; /* pair is a STRING followed by : and a value */
+array ::= LSQBRACKET RSQBRACKET | LSQBRACKET elements RSQBRACKET; /* arrays are marked by [] or [elements] */
+elements ::= value | value COMMA elements; /* elements contain either a value or multiple values separated by a comma */
+value ::= STRING | NUMBER | object | array | BOOLEAN | NULL; /* value holds multiple terminals and non-terminals */
