@@ -1,0 +1,38 @@
+plugins {
+  id "org.xbib.gradle.plugin.jflex" version "1.2.1"
+  id "com.github.andrescv.jcup" version "1.0"
+  id 'application'
+}
+
+repositories {
+  jcenter()
+  mavenCentral()
+}
+
+task prepare() {
+  dependsOn jflex
+  dependsOn jcup
+  println("JFlex and Cup have successuflly generate ")
+}
+
+dependencies {
+  implementation "com.github.vbmacher:java-cup-runtime:11b"
+}
+
+jar {
+  manifest {
+    attributes(
+      "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
+      "Main-Class": "Example.parser"
+    )
+  }
+
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
+
+application {
+  // Define the main class for the application.
+  mainClassName = 'Example.parser'
+}

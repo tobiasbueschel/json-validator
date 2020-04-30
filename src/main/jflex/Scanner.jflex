@@ -5,11 +5,12 @@ import java_cup.runtime.SymbolFactory;
 %cup
 %class Scanner
 %{
+	private SymbolFactory sf;
+
 	public Scanner(java.io.InputStream r, SymbolFactory sf){
 		this(r);
 		this.sf=sf;
 	}
-	private SymbolFactory sf;
 %}
 %eofval{
     return sf.newSymbol("EOF",sym.EOF);
@@ -21,25 +22,30 @@ Number = -?([1-9]+|0)\.?[0-9]* /* checks for positive and negative integers and 
 Boolean = (true|false)
 String = \"{Char}*\" /* A string always starts with " and ends with " */
 Char = [^\n\r\"] /* any character except for newline, carriage return or " */
-
 %%
-/* object start/end symbols */
+
+// object start/end symbols
 "{" { return sf.newSymbol("Left Curly Bracket",sym.LCBRACKET); }
 "}" { return sf.newSymbol("Right Curly Bracket",sym.RCBRACKET); }
 
-/* array start/end symbols */
+// array start/end symbols
 "[" { return sf.newSymbol("Left Square Bracket",sym.LSQBRACKET); }
 "]" { return sf.newSymbol("Right Square Bracket",sym.RSQBRACKET); }
 
 ":" { return sf.newSymbol("Comma",sym.COLON); }
 "," { return sf.newSymbol("Comma",sym.COMMA); }
 
-"null" { return sf.newSymbol("Null",sym.NULL); } /* catches null pointers */
-{Boolean} { return sf.newSymbol("Boolean",sym.BOOLEAN); } /* catches true or false boolean */
+// catches null pointers
+"null" { return sf.newSymbol("Null",sym.NULL); }
 
-/* string and number literals */
+// catches true or false boolean
+{Boolean} { return sf.newSymbol("Boolean",sym.BOOLEAN); }
+
+// string and number literals
 {Number} { return sf.newSymbol("Number",sym.NUMBER); }
 {String} { return sf.newSymbol("String",sym.STRING); }
 
 {WhiteSpace} { /* ignore white space. */ }
-. { System.err.println("Illegal character: "+yytext()); } /* catches anything else */
+
+// catches anything else
+. { System.err.println("Illegal character: "+yytext()); }
